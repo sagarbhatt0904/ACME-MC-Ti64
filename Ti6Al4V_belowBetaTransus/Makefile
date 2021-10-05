@@ -40,7 +40,7 @@ parallel: main.cpp graingrowth.cpp tessellate.hpp $(core)
 	$(pcompiler) -DPHASEFIELD $(flags) -include mpi.h $< -o parallel_GG.out -lz
 
 parallelmc: main.cpp graingrowth_MC.cpp tessellate.hpp $(core)
-	$(pcompiler) $(flags) -include mpi.h $< -o parallel_MC.out -lz -lblas -lpthread	
+	$(pcompiler) $(flags) -include mpi.h $< -o parallel_MC.out -lz -lblas -lpthread
 
 bgq: main.cpp graingrowth.cpp tessellate.hpp $(core)
 	$(qcompiler) $(qflags) -DBGQ -DSILENT -DPHASEFIELD -DRAW $< -o q_GG.out

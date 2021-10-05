@@ -50,20 +50,6 @@ template <typename T> int ilength(const T& i)
 int main(int argc, char* argv[]) {
 	MMSP::Init(argc, argv);
 
-	/*
-
-	Changes Made by Sagar Bhatt on July 3rd 2019 to include the temperature field from FE simulation
-
-	*/
-	getTempFromFile();
-
-
-	/*
-
-	End of changes
-
-	*/
-
 	unsigned long exec_cycles = rdtsc();
 
 	// check argument list
@@ -75,33 +61,33 @@ int main(int argc, char* argv[]) {
 	}
 
 	int nthreads = 1;
-	int increment_finished = 0;
-	long double physical_time = 0.0;
+  int increment_finished = 0;
+  long double physical_time = 0.0;
 
-	unsigned int rank = 0;
-	unsigned int np = 0;
-#ifdef MPI_VERSION
+	unsigned int rank=0;
+	unsigned int np=0;
+	#ifdef MPI_VERSION
 	rank = MPI::COMM_WORLD.Get_rank();
 	np = MPI::COMM_WORLD.Get_size();
-#endif
+	#endif
 
 
-#ifdef BGQ
-	double clock_rate = 1600000000.0;
-#else
+	#ifdef BGQ
+	double clock_rate=1600000000.0;
+	#else
 	// Read clock rate from GNU/Linux machine
-	double clock_rate = 2666700000.0;
+	double clock_rate=2666700000.0;
 	std::ifstream fh("/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies");
 	if (!fh)
-		clock_rate = 2667000000.0;
+		clock_rate=2667000000.0;
 	else {
-		fh >> clock_rate;
+		fh>>clock_rate;
 		fh.close();
 	}
-	clock_rate *= 1000.0;
-#endif
+	clock_rate*=1000.0;
+	#endif
 
-	// print help message and exit
+  	// print help message and exit
 	if (std::string(argv[1]) == std::string("--help")) {
 		std::cout << PROGRAM << ": " << MESSAGE << "\n\n";
 		std::cout << "Valid command lines have the form:\n";
@@ -176,9 +162,9 @@ int main(int argc, char* argv[]) {
 
 		// dimension must be 2 or 3
 		if (dim<2 or dim>3) {
-			std::cout << PROGRAM << ": initial grid must be of dimension 2 or 3.  Use\n\n";
-			std::cout << "    " << PROGRAM << " --help\n\n";
-			std::cout << "to generate help message.\n\n";
+			std::cout<<PROGRAM<<": initial grid must be of dimension 2 or 3.  Use\n\n";
+			std::cout<<"    "<<PROGRAM<<" --help\n\n";
+			std::cout<<"to generate help message.\n\n";
 			exit(-1);
 		}
 
@@ -189,10 +175,9 @@ int main(int argc, char* argv[]) {
 
 		// tessellate
 		char filename[FILENAME_MAX] = { }; //new char[outfile.length()+2];
-		for (unsigned int i = 0; i < outfile.length(); i++)
+		for (unsigned int i=0; i<outfile.length(); i++)
 			filename[i] = outfile[i];
 		//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
-
 		MMSP::generate(dim, filename, 0, nthreads);
 	}
 
@@ -201,7 +186,7 @@ int main(int argc, char* argv[]) {
 	//run tessellation & simulation
 	else if (std::string(argv[1]) == std::string("--nonstop")) {
 		// bad argument list
-		if (argc != 11 && argc != 10) {
+		if (argc!=11 && argc!=10) {
 			std::cout << PROGRAM << ": bad argument list.  Use\n\n";
 			std::cout << "    " << PROGRAM << " --help\n\n";
 			std::cout << "to generate help message.\n\n";
@@ -220,9 +205,9 @@ int main(int argc, char* argv[]) {
 
 		// dimension must be 2 or 3
 		if (dim<2 or dim>3) {
-			std::cout << PROGRAM << ": initial grid must be of dimension 2 or 3.  Use\n\n";
-			std::cout << "    " << PROGRAM << " --help\n\n";
-			std::cout << "to generate help message.\n\n";
+			std::cout<<PROGRAM<<": initial grid must be of dimension 2 or 3.  Use\n\n";
+			std::cout<<"    "<<PROGRAM<<" --help\n\n";
+			std::cout<<"to generate help message.\n\n";
 			exit(-1);
 		}
 
@@ -237,7 +222,7 @@ int main(int argc, char* argv[]) {
 			exit(-1);
 		}
 
-		int steps = atoi(argv[4]);
+		int steps=atoi(argv[4]);
 		// must have integral output increment
 		if (std::string(argv[5]).find_first_not_of("0123456789") != std::string::npos) {
 			std::cout << PROGRAM << ": output increment must have integral value.  Use\n\n";
@@ -266,17 +251,17 @@ int main(int argc, char* argv[]) {
 			exit(-1);
 		}
 
-		double temp[2] = {atof(argv[8]), atof(argv[9])};
+    double temp[2] = {atof(argv[8]), atof(argv[9])};
 
-		std::string initfile;
-		if (argc == 11) // if continue simulation from an existed file.
-			initfile = argv[10];
+    std::string initfile;
+    if (argc==11) // if continue simulation from an existed file.
+		  initfile = argv[10];
 
-		// set output file basename
+    // set output file basename
 		int iterations_start = 0;
 		std::string base;
 		const int last_dot = outfile.find_last_of(".");
-		if (outfile.find_last_of(".") == std::string::npos) // no dot found
+		if (outfile.find_last_of(".")==std::string::npos) // no dot found
 			base = outfile + ".";
 		else if (outfile.rfind(".", last_dot - 1) == std::string::npos) // only one dot found
 			base = outfile.substr(0, last_dot) + ".";
@@ -290,9 +275,9 @@ int main(int argc, char* argv[]) {
 				base = outfile.substr(0, prev_dot) + ".";
 			else base = outfile.substr(0, last_dot) + ".";
 		}
-#ifdef DEBUG
-		if (rank == 0) std::cout << "Filename base is " << base << std::endl;
-#endif
+		#ifdef DEBUG
+		if (rank==0) std::cout<<"Filename base is "<<base<<std::endl;
+		#endif
 
 		// set output file suffix
 		std::string suffix = "";
@@ -303,236 +288,229 @@ int main(int argc, char* argv[]) {
 		// set output filename length
 		int length = base.length() + suffix.length() + ilength(steps);
 
-#ifdef SILENT
-		if (rank == 0) std::cout << np << '\t' << nthreads << '\t' << std::flush;
-#endif
-		unsigned long init_cycles = 0, comp_cycles = 0;
-		double init_bw = 0.0, comp_bw = 0.0;
+		#ifdef SILENT
+		if (rank==0) std::cout<<np<<'\t'<<nthreads<<'\t'<<std::flush;
+		#endif
+		unsigned long init_cycles=0, comp_cycles=0;
+		double init_bw=0.0, comp_bw=0.0;
 		if (dim == 2) {
 			// tessellate
-			MMSP::grid<2, unsigned long>* grid = NULL;
-			if (argc == 10)
-				init_cycles = MMSP::generate<2>(grid, 0, nthreads);
-			else if (argc == 11) {
-				if (initfile.find(".txt") != std::string::npos) {
-					MMSP::growthexperiment<2>(grid, initfile.c_str());
-				} else {
-					MMSP::generate<2>(grid, initfile.c_str());
-				}
-			}
+			MMSP::grid<2,unsigned long>* grid=NULL;
+      if(argc == 10)
+			  init_cycles = MMSP::generate<2>(grid, 0, nthreads);
+      else if(argc == 11){
+        if(initfile.find(".txt") != std::string::npos){
+          MMSP::growthexperiment<2>(grid, initfile.c_str());
+        }else{
+          MMSP::generate<2>(grid, initfile.c_str());
+        }
+      }
 
-#ifndef SILENT
-			if (rank == 0) std::cout << "Finished tessellation in " << double(init_cycles) / clock_rate << " sec." << std::endl;
-#else
+			#ifndef SILENT
+			if (rank==0) std::cout<<"Finished tessellation in "<<double(init_cycles)/clock_rate<<" sec."<<std::endl;
+			#else
 			//if (rank==0) std::cout<<"init_time(sec)\t"<<double(init_cycles)/clock_rate<<std::endl;
 			//if (rank==0) std::cout<<double(init_cycles)/clock_rate<<'\t'<<std::flush;
-#endif
-			assert(grid != NULL);
+			#endif
+			assert(grid!=NULL);
 			char filename[FILENAME_MAX] = { }; //new char[outfile.length()+2];
-			for (unsigned int i = 0; i < outfile.length(); i++)
+			for (unsigned int i=0; i<outfile.length(); i++)
 				filename[i] = outfile[i];
 			//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
 
 			// write initialized grid to file
 			unsigned long iocycles = rdtsc();
 			double init_bw = 0.0;
-#ifdef BGQ
+			#ifdef BGQ
 			init_bw = MMSP::output_bgq(*grid, filename, nthreads);
 			init_bw *= clock_rate;
-#else
+			#else
 			MMSP::output(*grid, filename);
-#endif
+			#endif
 			iocycles = rdtsc() - iocycles;
-			unsigned long allio = 0;
+			unsigned long allio=0;
 			double allbw = 0.0;
-			double allbwsum = 0.0;
-#ifdef MPI_VERSION
+double allbwsum = 0.0;
+			#ifdef MPI_VERSION
 			MPI_Reduce(&iocycles, &allio, 1, MPI_UNSIGNED_LONG, MPI_MAX, 0, MPI::COMM_WORLD);
 			MPI_Reduce(&init_bw, &allbw, 1, MPI_DOUBLE, MPI_SUM, 0, MPI::COMM_WORLD);
-			allbwsum += allbw;
-#else
-			allio = iocycles;
-#endif
-#ifndef SILENT
-			if (rank == 0) std::cout << "Wrote " << outfile << " in " << allio / clock_rate << " sec. MP Write bandwidth was " << allbw << " B/s, excluding aggregation overhead." << std::endl;
-#else
+allbwsum += allbw;
+			#else
+			allio=iocycles;
+			#endif
+			#ifndef SILENT
+			if (rank==0) std::cout<<"Wrote "<<outfile<<" in "<<allio/clock_rate<<" sec. MP Write bandwidth was "<<allbw<<" B/s, excluding aggregation overhead."<<std::endl;
+			#else
 			//if (rank==0) std::cout<<"init_bw(B/s)\t"<<allbw<<std::endl;
 			//if (rank==0) std::cout<<allbw<<'\t'<<std::flush;
-#endif
+			#endif
 
 			// perform computation
 			for (int i = iterations_start; i < steps; i += increment) {
 //auto t_start = std::chrono::high_resolution_clock::now();
-				// if(i<step_to_nonuniform)
-				// 	{
-				// 		comp_cycles = MMSP::update(*grid, increment, increment_finished, nthreads, 0, i, physical_time, &temp[0]);
-				// 	}
-				// 	else
-				// 	{
-				comp_cycles = MMSP::update(*grid, increment, increment_finished, nthreads, step_to_nonuniform, i, physical_time, &temp[0]);
-				// }
 
-				increment_finished += increment;
+        comp_cycles = MMSP::update(*grid, increment, increment_finished, nthreads, step_to_nonuniform, physical_time, &temp[0]);
+     
+        increment_finished += increment;
 				unsigned long allcomp = 0;
-#ifdef MPI_VERSION
+				#ifdef MPI_VERSION
 				MPI_Reduce(&comp_cycles, &allcomp, 1, MPI_DOUBLE, MPI_SUM, 0, MPI::COMM_WORLD);
-#endif
+				#endif
 				//if (rank==0) std::cout<<"comp_time(sec)\t"<<double(allcomp)/(np*clock_rate)<<std::endl;
-				//if (rank==0) std::cout<<"CPU seconds are: "<<double(allcomp)/(np*clock_rate)<<'\t'<<std::flush;
+        //if (rank==0) std::cout<<"CPU seconds are: "<<double(allcomp)/(np*clock_rate)<<'\t'<<std::flush;
 //auto t_end = std::chrono::high_resolution_clock::now();
 //if (rank==0) std::cout<<"CPU seconds are: "<<double(allcomp)/clock_rate<<'\t'<<std::flush;
 				// generate output filename
 				std::stringstream outstr;
 				outstr << base;
-				while (outstr.str().length() < length - ilength(i + increment) - suffix.length())
+				while (outstr.str().length() < length - ilength(i+increment) - suffix.length())
 					outstr << '0';
-				outstr << i + increment << suffix;
+				outstr << i+increment << suffix;
 
 				// write grid output to file
 				char filename[FILENAME_MAX] = { }; //new char[outstr.str().length()+2];
-				for (unsigned int i = 0; i < outstr.str().length(); i++)
+				for (unsigned int i=0; i<outstr.str().length(); i++)
 					filename[i] = outstr.str()[i];
 				//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
 				iocycles = rdtsc();
-#ifdef DEBUG
-				if (rank == 0) std::cout << "Writing " << std::string(filename) << std::endl;
-#endif
+				#ifdef DEBUG
+				if (rank==0) std::cout<<"Writing "<<std::string(filename)<<std::endl;
+				#endif
 				//#if defined(BGQ) && defined(PHASEFIELD)
-#ifdef BGQ
+				#ifdef BGQ
 				comp_bw = MMSP::output_bgq(*grid, filename, nthreads);
-				MPI::COMM_WORLD.Barrier();
+	      MPI::COMM_WORLD.Barrier();
 //        MMSP::output_bgq_Pfield(*grid, strcat(filename,"p"), nthreads);
-#else
+				#else
 //        MMSP::output_Pfield(*grid, strcat(filename,"p"));
-
 				MMSP::output(*grid, filename);
 
-#endif
+				#endif
 				comp_bw *= clock_rate;
 				iocycles = rdtsc() - iocycles;
-#ifdef MPI_VERSION
+				#ifdef MPI_VERSION
 				MPI_Reduce(&iocycles, &allio, 1, MPI_UNSIGNED_LONG, MPI_MAX, 0, MPI::COMM_WORLD);
 				MPI_Reduce(&comp_bw, &allbw, 1, MPI_DOUBLE, MPI_SUM, 0, MPI::COMM_WORLD);
-				allbwsum += allbw;
-#else
+allbwsum += allbw;
+				#else
 				allio = iocycles;
-#endif
-#ifndef SILENT
-				if (rank == 0) std::cout << "Wrote " << outfile << " in " << allio << " sec." << std::endl;
-#else
+				#endif
+				#ifndef SILENT
+				if (rank==0) std::cout<<"Wrote "<<outfile<<" in "<<allio<<" sec."<<std::endl;
+				#else
 				//if (rank==0) std::cout<<"comp_bw(B/s)\t"<<allbw<<std::endl;
 				//if (rank==0) std::cout<<allbw<<'\t'<<std::flush;
-#endif
+				#endif
 				outstr.str("");
 			}
-//      if (rank==0) std::cout<<"physical time is "<<physical_time<<std::endl;
-			if (grid != NULL) delete grid; grid = NULL;
+//      if (rank==0) std::cout<<"physical time is "<<physical_time<<std::endl; 
+			if (grid!=NULL) delete grid; grid=NULL;
 		}
 
 		if (dim == 3) {
 			// tessellate
-			MMSP::grid<3, unsigned long>* grid = NULL;
-			if (argc == 10)
-				init_cycles = MMSP::generate<3>(grid, 0, nthreads);
-			else if (argc == 11) {
-				if (initfile.find(".txt") != std::string::npos) {
-					MMSP::growthexperiment<3>(grid, initfile.c_str());
-				} else {
-					MMSP::generate<3>(grid, initfile.c_str());
-				}
-			}
+		  MMSP::grid<3,unsigned long>* grid=NULL;
+      if(argc == 10)
+			  init_cycles = MMSP::generate<3>(grid, 0, nthreads);
+      else if(argc == 11){
+        if(initfile.find(".txt") != std::string::npos){
+          MMSP::growthexperiment<3>(grid, initfile.c_str());
+        }else{
+          MMSP::generate<3>(grid, initfile.c_str());
+        }
+      }
 
 
-#ifndef SILENT
-			if (rank == 0) std::cout << "Finished tessellation in " << double(init_cycles) / clock_rate << " sec." << std::endl;
-#else
+			#ifndef SILENT
+			if (rank==0) std::cout<<"Finished tessellation in "<<double(init_cycles)/clock_rate<<" sec."<<std::endl;
+			#else
 			//if (rank==0) std::cout<<"init_time(sec)\t"<<double(init_cycles)/clock_rate<<std::endl;
 			//if (rank==0) std::cout<<double(init_cycles)/clock_rate<<'\t'<<std::flush;
-#endif
-			assert(grid != NULL);
+			#endif
+			assert(grid!=NULL);
 			char filename[FILENAME_MAX] = { }; //new char[outfile.length()+2];
-			for (unsigned int i = 0; i < outfile.length(); i++)
+			for (unsigned int i=0; i<outfile.length(); i++)
 				filename[i] = outfile[i];
 			//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
 			unsigned long iocycles = rdtsc();
 			//#if defined(BGQ) && defined(PHASEFIELD)
-#ifdef BGQ
+			#ifdef BGQ
 			init_bw = MMSP::output_bgq(*grid, filename, nthreads);
 			init_bw *= clock_rate;
-#else
+			#else
 			MMSP::output(*grid, filename);
-#endif
+			#endif
 			iocycles = rdtsc() - iocycles;
 			unsigned long allio = 0;
-			double allbw = 0.0;
-#ifdef MPI_VERSION
+			double allbw=0.0;
+			#ifdef MPI_VERSION
 			MPI_Reduce(&iocycles, &allio, 1, MPI_UNSIGNED_LONG, MPI_MAX, 0, MPI::COMM_WORLD);
 			MPI_Reduce(&init_bw, &allbw, 1, MPI_DOUBLE, MPI_SUM, 0, MPI::COMM_WORLD);
-#else
+			#else
 			allio = iocycles;
-#endif
-#ifndef SILENT
-			if (rank == 0) std::cout << "Wrote " << outfile << " in " << allio / clock_rate << " sec." << std::endl;
-#else
+			#endif
+			#ifndef SILENT
+			if (rank==0) std::cout<<"Wrote "<<outfile<<" in "<<allio/clock_rate<<" sec."<<std::endl;
+			#else
 			//if (rank==0) std::cout<<"init_bw(B/s)\t"<<allbw<<std::endl;
 			//if (rank==0) std::cout<<allbw<<'\t'<<std::flush;
-#endif
+			#endif
 
 			// perform computation
 			for (int i = iterations_start; i < steps; i += increment) {
 
-				comp_cycles = MMSP::update(*grid, increment, increment_finished, nthreads, step_to_nonuniform , i, physical_time, &temp[0]);
-
-				increment_finished += increment;
+        comp_cycles = MMSP::update(*grid, increment, increment_finished, nthreads, step_to_nonuniform, physical_time, &temp[0]);
+        
+        increment_finished += increment;
 				unsigned long allcomp = 0;
-#ifdef MPI_VERSION
+				#ifdef MPI_VERSION
 				MPI_Reduce(&comp_cycles, &allcomp, 1, MPI_DOUBLE, MPI_SUM, 0, MPI::COMM_WORLD);
-#endif
-#ifndef SILENT
-				if (rank == 0) std::cout << "comp_time(sec)\t" << double(allcomp) / (np * clock_rate) << std::endl;
-#else
+				#endif
+				#ifndef SILENT
+				if (rank==0) std::cout<<"comp_time(sec)\t"<<double(allcomp)/(np*clock_rate)<<std::endl;
+				#else
 				//if (rank==0) std::cout<<double(allcomp)/(np*clock_rate)<<'\t'<<std::flush;
-#endif
+				#endif
 
 				// generate output filename
 				std::stringstream outstr;
 				outstr << base;
-				while (outstr.str().length() < length - ilength(i + increment) - suffix.length())
+				while (outstr.str().length() < length - ilength(i+increment) - suffix.length())
 					outstr << '0';
 				outstr << i + increment << suffix;
 
 				// write grid output to file
 				char filename[FILENAME_MAX] = { }; //new char[outstr.str().length()+2];
-				for (unsigned int i = 0; i < outstr.str().length(); i++)
+				for (unsigned int i=0; i<outstr.str().length(); i++)
 					filename[i] = outstr.str()[i];
 				//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
 				iocycles = rdtsc();
-#ifdef DEBUG
-				if (rank == 0) std::cout << "Writing " << std::string(filename) << std::endl;
-#endif
+				#ifdef DEBUG
+				if (rank==0) std::cout<<"Writing "<<std::string(filename)<<std::endl;
+				#endif
 				//#if defined(BGQ) && defined(PHASEFIELD)
-#ifdef BGQ
+				#ifdef BGQ
 				comp_bw = MMSP::output_bgq(*grid, filename, nthreads);
-#else
+				#else
 				MMSP::output(*grid, filename);
-#endif
+				#endif
 				comp_bw *= clock_rate;
 				iocycles = rdtsc() - iocycles;
-#ifdef MPI_VERSION
+				#ifdef MPI_VERSION
 				MPI_Reduce(&iocycles, &allio, 1, MPI_UNSIGNED_LONG, MPI_MAX, 0, MPI::COMM_WORLD);
 				MPI_Reduce(&comp_bw, &allbw, 1, MPI_DOUBLE, MPI_SUM, 0, MPI::COMM_WORLD);
-#else
+				#else
 				allio = iocycles;
-#endif
-#ifndef SILENT
-				if (rank == 0) std::cout << "Wrote " << outfile << " in " << allio / clock_rate << " sec." << std::endl;
-#else
+				#endif
+				#ifndef SILENT
+				if (rank==0) std::cout<<"Wrote "<<outfile<<" in "<<allio/clock_rate<<" sec."<<std::endl;
+				#else
 				//if (rank==0) std::cout<<"comp_bw(B/s)\t"<<allbw<<std::endl;
 				//if (rank==0) std::cout<<allbw<<'\t'<<std::flush;
-#endif
+				#endif
 				outstr.str("");
 			}
-			if (grid != NULL) delete grid; grid = NULL;
+			if (grid!=NULL) delete grid; grid=NULL;
 		}
 	}
 
@@ -552,9 +530,9 @@ int main(int argc, char* argv[]) {
 		int increment;
 		std::string outfile;
 
-		outfile = argv[1];
-		steps = atoi(argv[2]);
-		increment = atoi(argv[3]);
+    outfile = argv[1];
+    steps = atoi(argv[2]);
+    increment = atoi(argv[3]);
 		nthreads = atoi(argv[4]);
 
 		if (std::string(argv[2]).find_first_not_of("0123456789") == std::string::npos) {
@@ -691,29 +669,29 @@ int main(int argc, char* argv[]) {
 			for (int i = iterations_start; i < steps; i += increment) {
 
 //				MMSP::update_uniformly(grid, increment, nthreads);
-				increment_finished += increment;
+        increment_finished += increment;
 
 				// generate output filename
 				std::stringstream outstr;
 				outstr << base;
-				while (outstr.str().length() < length - ilength(i + increment) - suffix.length())
+				while (outstr.str().length() < length - ilength(i+increment) - suffix.length())
 					outstr << '0';
 				outstr << i + increment << suffix;
 
 				// write grid output to file
 				char filename[FILENAME_MAX] = { }; //new char[outstr.str().length()+2];
-				for (unsigned int i = 0; i < outstr.str().length(); i++)
+				for (unsigned int i=0; i<outstr.str().length(); i++)
 					filename[i] = outstr.str()[i];
 				//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
-#ifdef DEBUG
-				if (rank == 0) std::cout << "Writing " << std::string(filename) << std::endl;
-#endif
+				#ifdef DEBUG
+				if (rank==0) std::cout<<"Writing "<<std::string(filename)<<std::endl;
+				#endif
 				//#if defined(BGQ) && defined(PHASEFIELD)
-#ifdef BGQ
+				#ifdef BGQ
 				MMSP::output_bgq(grid, filename, nthreads);
-#else
+				#else
 				MMSP::output(grid, filename);
-#endif
+				#endif
 				outstr.str("");
 			}
 		}
@@ -725,44 +703,44 @@ int main(int argc, char* argv[]) {
 			// perform computation
 			for (int i = iterations_start; i < steps; i += increment) {
 //				MMSP::update_uniformly(grid, increment, nthreads);
-				increment_finished += increment;
+        increment_finished += increment;
 
 				// generate output filename
 				std::stringstream outstr;
 				outstr << base;
-				while (outstr.str().length() < length - ilength(i + increment) - suffix.length())
+				while (outstr.str().length() < length - ilength(i+increment) - suffix.length())
 					outstr << '0';
 				outstr << i + increment << suffix;
 
 				// write grid output to file
 				char filename[FILENAME_MAX] = { }; //new char[outstr.str().length()+2];
-				for (unsigned int i = 0; i < outstr.str().length(); i++)
+				for (unsigned int i=0; i<outstr.str().length(); i++)
 					filename[i] = outstr.str()[i];
 				//for (unsigned int i=outfile.length(); i<FILENAME_MAX; i++) filename[i] = '\0';
-#ifdef DEBUG
-				if (rank == 0) std::cout << "Writing " << std::string(filename) << std::endl;
-#endif
+				#ifdef DEBUG
+				if (rank==0) std::cout<<"Writing "<<std::string(filename)<<std::endl;
+				#endif
 				//#if defined(BGQ) && defined(PHASEFIELD)
-#ifdef BGQ
+				#ifdef BGQ
 				MMSP::output_bgq(grid, filename, nthreads);
-#else
+				#else
 				MMSP::output(grid, filename);
-#endif
+				#endif
 				outstr.str("");
 			}
 		}
 	}
 
 	exec_cycles = rdtsc() - exec_cycles;
-	unsigned long allexec = exec_cycles;
-#ifdef MPI_VERSION
+	unsigned long allexec=exec_cycles;
+	#ifdef MPI_VERSION
 	MPI_Reduce(&exec_cycles, &allexec, 1, MPI_UNSIGNED_LONG, MPI_SUM, 0, MPI::COMM_WORLD);
-#endif
-#ifndef SILENT
-	if (rank == 0) std::cout << "exec_time(sec)\t" << double(allexec) / (np * clock_rate) << std::endl;
-#else
-	if (rank == 0) std::cout << double(allexec) / (np * clock_rate) << std::endl;
-#endif
+	#endif
+	#ifndef SILENT
+	if (rank==0) std::cout<<"exec_time(sec)\t"<<double(allexec)/(np*clock_rate)<<std::endl;
+	#else
+	if (rank==0) std::cout<<double(allexec)/(np*clock_rate)<<std::endl;
+	#endif
 
 	MMSP::Finalize();
 
