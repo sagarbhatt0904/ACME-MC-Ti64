@@ -75,10 +75,9 @@ double R = 8.314;
 
 
 // grid point dimension
-int dim_x =100; 
-int dim_y = 100; 
+int dim_x =500; 
+int dim_y = 500; 
 int dim_z = 50; 
-std::vector<std::vector<double> > u_t(dim_x,std::vector<double>(dim_y, 0));
 
 
 #ifndef SILENT
